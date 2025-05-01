@@ -1,0 +1,21 @@
+type PixKeyResponse {
+    success: Boolean!
+    message: String
+    key: String
+    accountInfo: AccountInfo
+  }
+
+  type AccountInfo {
+    name: String
+    bank: String
+    accountType: String
+    accountNumber: String
+  }
+
+  type Query {
+    hello: String
+  }
+
+  type Mutation {
+    queryPixKey(key: String!): PixKeyResponse
+  }
