@@ -11,6 +11,7 @@
     "lint:fix": "eslint . --ext .ts --fix"
   },
   "dependencies": {
+    "@koa/cors": "^5.0.0",
     "@koa/router": "^13.1.0",
     "apollo-server-koa": "^3.13.0",
     "bcryptjs": "^3.0.2",
@@ -43,4 +44,4 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
-} 
+}
