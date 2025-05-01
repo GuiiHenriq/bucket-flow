@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<605537f6a49df1812a3b3af2b1ad73ae>>
+ * @generated SignedSource<<a599ea89f70e7bb5f1dac11192851ea0>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,17 +13,17 @@ export type PIXTransactionMutation$variables = {
   key: string;
 };
 export type PIXTransactionMutation$data = {
-  readonly queryPIX: {
-    readonly data: {
-      readonly accountNumber: string;
-      readonly accountType: string;
-      readonly bank: string;
-      readonly key: string;
-      readonly name: string;
+  readonly queryPixKey: {
+    readonly accountInfo: {
+      readonly accountNumber: string | null | undefined;
+      readonly accountType: string | null | undefined;
+      readonly bank: string | null | undefined;
+      readonly name: string | null | undefined;
     } | null | undefined;
-    readonly message: string;
+    readonly key: string | null | undefined;
+    readonly message: string | null | undefined;
     readonly success: boolean;
-  };
+  } | null | undefined;
 };
 export type PIXTransactionMutation = {
   response: PIXTransactionMutation$data;
@@ -48,9 +48,9 @@ v1 = [
         "variableName": "key"
       }
     ],
-    "concreteType": "PIXResponse",
+    "concreteType": "PixKeyResponse",
     "kind": "LinkedField",
-    "name": "queryPIX",
+    "name": "queryPixKey",
     "plural": false,
     "selections": [
       {
@@ -70,18 +70,18 @@ v1 = [
       {
         "alias": null,
         "args": null,
-        "concreteType": "PIXData",
+        "kind": "ScalarField",
+        "name": "key",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "AccountInfo",
         "kind": "LinkedField",
-        "name": "data",
+        "name": "accountInfo",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "key",
-            "storageKey": null
-          },
           {
             "alias": null,
             "args": null,
@@ -135,16 +135,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "85526f8d205e8823e0f6902e3ab36d93",
+    "cacheID": "a532f1d7c8cb93c69ba532c5f1270072",
     "id": null,
     "metadata": {},
     "name": "PIXTransactionMutation",
     "operationKind": "mutation",
-    "text": "mutation PIXTransactionMutation(\n  $key: String!\n) {\n  queryPIX(key: $key) {\n    success\n    message\n    data {\n      key\n      name\n      bank\n      accountType\n      accountNumber\n    }\n  }\n}\n"
+    "text": "mutation PIXTransactionMutation(\n  $key: String!\n) {\n  queryPixKey(key: $key) {\n    success\n    message\n    key\n    accountInfo {\n      name\n      bank\n      accountType\n      accountNumber\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5469659ae7f5e84bcb0c164d593fddd7";
+(node as any).hash = "9affffbda4abea8ceb341c57eaf988d4";
 
 export default node;

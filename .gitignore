@@ -3,6 +3,8 @@ node_modules/
 .pnp/
 .pnp.js
 
+frontend2/
+
 # Testing
 coverage/
 
