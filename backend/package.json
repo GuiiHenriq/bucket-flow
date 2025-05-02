@@ -21,6 +21,7 @@
     "koa": "^2.16.1",
     "koa-bodyparser": "^4.4.1",
     "koa-logger": "^3.2.1",
+    "mongoose": "^8.14.1",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
