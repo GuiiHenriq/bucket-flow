@@ -38,7 +38,7 @@ export function PIXTransaction() {
           setError(errors[0].message);
           return;
         }
-        setResult(response.queryPIX);
+        setResult(response.queryPixKey);
       },
       onError: (error) => {
         setError(error.message);

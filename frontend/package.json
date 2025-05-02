@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -23,12 +23,14 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-relay": "^14.0.0",
-    "relay-runtime": "^14.0.0"
+    "relay-runtime": "^14.0.0",
+    "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.27.0",
+    "@types/node": "^20.11.19",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@types/react-relay": "^14.1.5",

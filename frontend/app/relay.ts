@@ -103,9 +103,7 @@ const network = Network.create(fetchGraphQL);
 const store = new Store(new RecordSource());
 
 // Criação do ambiente usando esta rede
-const environment = new Environment({
+export const environment = new Environment({
   network,
   store,
 });
-
-export default environment;
