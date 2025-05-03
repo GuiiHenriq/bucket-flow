@@ -12,10 +12,33 @@ type PixKeyResponse {
     accountNumber: String
   }
 
+  type User {
+    id: ID!
+    username: String!
+  }
+
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
+
+  input RegisterInput {
+    username: String!
+    password: String!
+  }
+
+  input LoginInput {
+    username: String!
+    password: String!
+  }
+
   type Query {
     hello: String
+    me: User
   }
 
   type Mutation {
     queryPixKey(key: String!): PixKeyResponse
+    register(input: RegisterInput!): AuthPayload!
+    login(input: LoginInput!): AuthPayload!
   }

@@ -30,47 +30,9 @@ export const networkLogger = {
   }
 };
 
-// Função para obter o token de autenticação da API
-async function getAuthToken() {
-  try {
-    const response = await fetch('http://localhost:3000/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: "user1",
-        password: "password1"
-      }),
-    });
-    
-    if (!response.ok) {
-      throw new Error('Falha na autenticação');
-    }
-    
-    const data = await response.json();
-    return data.token;
-  } catch (error) {
-    console.error('Erro ao obter token:', error);
-    return null;
-  }
-}
-
-// Armazenamento em memória do token
-let authToken: string | null = null;
-
-// Função para garantir que temos um token válido
-async function ensureToken() {
-  if (!authToken) {
-    authToken = await getAuthToken();
-  }
-  return authToken;
-}
-
 // Função que busca resultados de operações GraphQL
 async function fetchGraphQL(operation: RequestParameters, variables: Variables) {
-  // Obtém o token antes de fazer a requisição GraphQL
-  const token = await ensureToken();
+  const token = localStorage.getItem('token');
   
   const response = await fetch('http://localhost:3000/graphql', {
     method: 'POST',
