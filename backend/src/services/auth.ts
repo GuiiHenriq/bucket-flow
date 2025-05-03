@@ -26,11 +26,15 @@ export const register = async (ctx: Context) => {
     // Generate token
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "24h" });
 
-    ctx.status = 201;
-    ctx.body = { token };
+    return {
+      token,
+      id: user._id,
+      username: user.username
+    };
   } catch (error) {
     ctx.status = 500;
     ctx.body = { error: "Error creating user" };
+    throw error;
   }
 };
 
@@ -57,10 +61,15 @@ export const login = async (ctx: Context) => {
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "24h" });
 
-    ctx.body = { token };
+    return {
+      token,
+      id: user._id,
+      username: user.username
+    };
   } catch (error) {
     ctx.status = 500;
     ctx.body = { error: "Error during login" };
+    throw error;
   }
 };
 
