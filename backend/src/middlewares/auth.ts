@@ -12,7 +12,6 @@ interface GraphQLRequestBody {
 
 export const authMiddleware = async (ctx: Context, next: Next) => {
   try {
-    // Permitir requisições OPTIONS e mutações de autenticação
     if (
       ctx.path === "/api/login" ||
       ctx.path === "/api/register" ||
@@ -30,7 +29,7 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
       return;
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const token = authHeader.substring(7);
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
 
     const user = await User.findById(decoded.id) as IUser;

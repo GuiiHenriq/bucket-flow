@@ -100,7 +100,6 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = networkLogger.addListener((data) => {
-      // Verifica se há erro de rate limit na resposta GraphQL
       const errors = data?.response?.errors;
       if (errors && Array.isArray(errors)) {
         const rateLimitError = errors.find((e: any) =>

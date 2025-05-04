@@ -6,13 +6,11 @@ export function GraphQLResponseViewer() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Registrar um ouvinte para novas respostas
     const unsubscribe = networkLogger.addListener((newResponse) => {
       setResponse(newResponse);
       setIsVisible(true);
     });
-    
-    // Limpar o ouvinte quando o componente for desmontado
+
     return () => unsubscribe();
   }, []);
 

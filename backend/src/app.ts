@@ -2,7 +2,7 @@ import Koa from "koa";
 import Router from "@koa/router";
 import bodyParser from "koa-bodyparser";
 import logger from "koa-logger";
-import cors from "@koa/cors"; // <-- importa o cors para Koa
+import cors from "@koa/cors";
 import { ApolloServer } from "apollo-server-koa";
 import { typeDefs, resolvers } from "./graphql/schema";
 import { authMiddleware } from "./middlewares/auth";

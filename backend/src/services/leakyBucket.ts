@@ -33,10 +33,6 @@ export const consumeToken = (userId: string): boolean => {
   if (bucket.tokens <= 0) {
     return false;
   }
-
-  bucket.tokens -= 1;
-  userTokens.set(userId, bucket);
-
   return true;
 };
 
@@ -44,17 +40,14 @@ export const processQueryResult = (userId: string, success: boolean): void => {
   const bucket = getUserTokens(userId);
 
   if (!success) {
-    userTokens.set(userId, bucket);
-  } else {
-    bucket.tokens = Math.min(bucket.tokens + 1, MAX_TOKENS);
-    userTokens.set(userId, bucket);
+    bucket.tokens = Math.max(0, bucket.tokens - 1);
   }
+  userTokens.set(userId, bucket);
 };
 
 export const refillTokens = (): void => {
   console.log("Refilling tokens...");
   userTokens.forEach((bucket, userId) => {
-    // Add one token per hour, up to max
     bucket.tokens = Math.min(bucket.tokens + 1, MAX_TOKENS);
     bucket.lastRefill = new Date();
     userTokens.set(userId, bucket);

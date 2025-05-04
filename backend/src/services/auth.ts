@@ -11,7 +11,6 @@ export const register = async (ctx: Context) => {
       password: string;
     };
 
-    // Check if user already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       ctx.status = 400;
@@ -19,11 +18,9 @@ export const register = async (ctx: Context) => {
       return;
     }
 
-    // Create new user
     const user = new User({ username, password });
     await user.save();
 
-    // Generate token
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "24h" });
 
     return {
