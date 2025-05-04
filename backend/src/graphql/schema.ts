@@ -1,7 +1,28 @@
 import { gql } from "apollo-server-koa";
 import { consumeToken, processQueryResult } from "../services/leakyBucket";
+import { register, login } from "../services/auth";
 
 export const typeDefs = gql`
+  type User {
+    id: ID!
+    username: String!
+  }
+
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
+
+  input RegisterInput {
+    username: String!
+    password: String!
+  }
+
+  input LoginInput {
+    username: String!
+    password: String!
+  }
+
   type PixKeyResponse {
     success: Boolean!
     message: String
@@ -18,9 +39,12 @@ export const typeDefs = gql`
 
   type Query {
     hello: String
+    me: User
   }
 
   type Mutation {
+    register(input: RegisterInput!): AuthPayload!
+    login(input: LoginInput!): AuthPayload!
     queryPixKey(key: String!): PixKeyResponse
   }
 `;
@@ -63,11 +87,53 @@ const simulateExternalCall = (
   return { success: true, data: foundKey };
 };
 
+interface AuthResponse {
+  token: string;
+  id: string;
+  username: string;
+}
+
 export const resolvers = {
   Query: {
     hello: () => "Hello World!",
+    me: (_: any, __: any, context: any) => {
+      if (!context.user) {
+        throw new Error("Not authenticated");
+      }
+      return context.user;
+    },
   },
   Mutation: {
+    register: async (_: any, { input }: { input: { username: string; password: string } }) => {
+      const response = await register({ request: { body: input } } as any) as AuthResponse;
+      
+      if (!response) {
+        throw new Error("Registration failed");
+      }
+
+      return {
+        token: response.token,
+        user: {
+          id: response.id,
+          username: response.username,
+        },
+      };
+    },
+    login: async (_: any, { input }: { input: { username: string; password: string } }) => {
+      const response = await login({ request: { body: input } } as any) as AuthResponse;
+      
+      if (!response) {
+        throw new Error("Login failed");
+      }
+
+      return {
+        token: response.token,
+        user: {
+          id: response.id,
+          username: response.username,
+        },
+      };
+    },
     queryPixKey: (_: any, { key }: { key: string }, context: any) => {
       const { user } = context;
 

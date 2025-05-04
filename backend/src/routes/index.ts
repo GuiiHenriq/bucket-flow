@@ -1,9 +1,10 @@
 import Router from "@koa/router";
-import { login } from "../services/auth";
+import { login, register } from "../services/auth";
 import { leakyBucketMiddleware } from "../middlewares/leakyBucket";
 import { getUserTokens } from "../services/leakyBucket";
 
 export const routes = (router: Router) => {
+  router.post("/api/register", register);
   router.post("/api/login", login);
 
   router.get("/api/tokens", leakyBucketMiddleware, async (ctx) => {

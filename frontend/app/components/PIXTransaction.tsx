@@ -2,6 +2,10 @@ import { useState } from "react";
 import { graphql, useMutation } from "react-relay";
 import type { PIXTransactionMutation } from "../__generated__/PIXTransactionMutation.graphql";
 
+interface PIXTransactionProps {
+  onTransaction?: () => void;
+}
+
 const PIXQueryMutation = graphql`
   mutation PIXTransactionMutation($key: String!) {
     queryPixKey(key: $key) {
@@ -18,7 +22,7 @@ const PIXQueryMutation = graphql`
   }
 `;
 
-export function PIXTransaction() {
+export function PIXTransaction({ onTransaction }: PIXTransactionProps) {
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
   const [result, setResult] = useState<any>(null);
@@ -36,12 +40,15 @@ export function PIXTransaction() {
       onCompleted: (response, errors) => {
         if (errors) {
           setError(errors[0].message);
+          onTransaction && onTransaction();
           return;
         }
-        setResult(response.queryPIX);
+        setResult(response.queryPixKey);
+        onTransaction && onTransaction();
       },
       onError: (error) => {
         setError(error.message);
+        onTransaction && onTransaction();
       },
     });
   };
