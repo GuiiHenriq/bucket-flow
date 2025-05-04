@@ -6,7 +6,7 @@ interface TokenBucket {
   lastRefill: Date;
 }
 
-const MAX_TOKENS = 10;
+export const MAX_TOKENS = 10;
 const userTokens: Map<string, TokenBucket> = new Map();
 
 export const initUserTokens = (userId: string): TokenBucket => {
