@@ -20,7 +20,6 @@ export const routes = (router: Router) => {
   router.post("/api/pix/query", leakyBucketMiddleware, async (ctx) => {
     const { key } = ctx.request.body as { key: string };
 
-    // Mock PIX key lookup
     const success = Math.random() < 0.8; // 80% chance of success
 
     ctx.body = {
