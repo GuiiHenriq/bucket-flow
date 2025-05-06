@@ -22,6 +22,11 @@ type PixKeyResponse {
     user: User!
   }
 
+  type TokenBucket {
+    tokens: Int!
+    lastRefill: String!
+  }
+
   input RegisterInput {
     username: String!
     password: String!
@@ -35,10 +40,12 @@ type PixKeyResponse {
   type Query {
     hello: String
     me: User
+    getTokens: TokenBucket
   }
 
   type Mutation {
     queryPixKey(key: String!): PixKeyResponse
     register(input: RegisterInput!): AuthPayload!
     login(input: LoginInput!): AuthPayload!
+    getTokens: TokenBucket
   }

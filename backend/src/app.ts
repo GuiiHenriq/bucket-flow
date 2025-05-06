@@ -6,7 +6,6 @@ import cors from "@koa/cors";
 import { ApolloServer } from "apollo-server-koa";
 import { typeDefs, resolvers } from "./graphql/schema";
 import { authMiddleware } from "./middlewares/auth";
-import { routes } from "./routes";
 
 const app = new Koa();
 
@@ -26,7 +25,6 @@ app.use(bodyParser());
 app.use(authMiddleware);
 
 const router = new Router();
-routes(router);
 app.use(router.routes()).use(router.allowedMethods());
 
 apolloServer.start().then(() => {
