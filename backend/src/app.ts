@@ -13,9 +13,12 @@ const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ ctx }) => {
-    // Debug log to check if user is being correctly set from the middleware
-    console.log(`GraphQL Request - Auth Status: ${ctx.state.user ? 'Authenticated' : 'Not Authenticated'}`);
-    
+    console.log(
+      `GraphQL Request - Auth Status: ${
+        ctx.state.user ? "Authenticated" : "Not Authenticated"
+      }`
+    );
+
     return { user: ctx.state.user };
   },
 });

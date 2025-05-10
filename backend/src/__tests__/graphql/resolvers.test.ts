@@ -1,11 +1,13 @@
 import { resolvers } from "../../graphql/schema";
 import { setUserTokens } from "../../services/redisLeakyBucket";
-import { consumeToken, processQueryResult } from "../../services/redisLeakyBucket";
+import {
+  consumeToken,
+  processQueryResult,
+} from "../../services/redisLeakyBucket";
 
-// Mock Redis e funções relevantes do leaky bucket
 jest.mock("../../services/redisLeakyBucket", () => {
   const tokens = new Map<string, number>();
-  
+
   return {
     setUserTokens: jest.fn(async (userId: string, tokenCount: number) => {
       tokens.set(userId, tokenCount);
@@ -14,7 +16,7 @@ jest.mock("../../services/redisLeakyBucket", () => {
       return {
         userId,
         tokens: tokens.get(userId) || 10,
-        lastRefill: new Date()
+        lastRefill: new Date(),
       };
     }),
     consumeToken: jest.fn(async (userId: string) => {
@@ -28,7 +30,7 @@ jest.mock("../../services/redisLeakyBucket", () => {
         const currentTokens = tokens.get(userId) || 0;
         tokens.set(userId, Math.min(currentTokens + 1, 10));
       }
-    })
+    }),
   };
 });
 

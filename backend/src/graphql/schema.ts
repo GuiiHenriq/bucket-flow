@@ -122,12 +122,8 @@ const getTokensBucket = async (context: any) => {
   };
 };
 
-// Função para verificar se o usuário é admin
-// Na vida real, isso viria do modelo de usuário
 const isAdmin = (context: any): boolean => {
-  // Exemplo simples para fins de demonstração
-  // Em produção, isso dependeria de um campo no modelo de usuário ou outra lógica
-  const adminUserIds = ['admin', '1', 'admin-user'];
+  const adminUserIds = ["admin", "1", "admin-user"];
   return context.user && adminUserIds.includes(context.user.id);
 };
 
@@ -143,16 +139,14 @@ export const resolvers = {
     getTokens: async (_: any, __: any, context: any) => {
       return await getTokensBucket(context);
     },
-    // Nova consulta para painel administrativo
     getAllTokens: async (_: any, __: any, context: any) => {
-      // Verificar se o usuário é um administrador
       if (!isAdmin(context)) {
         throw new Error("Admin privileges required");
       }
-      
+
       const buckets = await getAllUserTokens();
-      
-      return buckets.map(bucket => ({
+
+      return buckets.map((bucket) => ({
         userId: bucket.userId,
         tokens: bucket.tokens,
         lastRefill: bucket.lastRefill.toISOString(),

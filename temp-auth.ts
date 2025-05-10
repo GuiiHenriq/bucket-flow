@@ -11,24 +11,19 @@ interface GraphQLRequestBody {
 }
 
 export const authMiddleware = async (ctx: Context, next: Next) => {
-  // Para debug
   console.log("Path:", ctx.path);
   console.log("Method:", ctx.method);
   console.log("Body:", JSON.stringify(ctx.request.body));
 
   try {
-    // Permitir requisições OPTIONS
     if (ctx.method === "OPTIONS") {
       return await next();
     }
 
-    // Simplificando drasticamente para testes
-    // Permitir todas as requisições para /graphql
     if (ctx.path === "/graphql") {
       return await next();
     }
 
-    // Para todas as outras rotas, exigir autenticação
     const authHeader = ctx.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       ctx.status = 401;
@@ -56,4 +51,4 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
     ctx.status = 401;
     ctx.body = { error: "Invalid token" };
   }
-}; 
+};
