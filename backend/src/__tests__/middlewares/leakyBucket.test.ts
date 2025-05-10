@@ -1,6 +1,25 @@
 import { Context } from 'koa';
 import { leakyBucketMiddleware } from '../../middlewares/leakyBucket';
-import { setUserTokens } from '../../services/leakyBucket';
+import { setUserTokens } from '../../services/redisLeakyBucket';
+
+// Mock do módulo consumeToken para evitar chamadas reais ao Redis durante testes
+jest.mock('../../services/redisLeakyBucket', () => {
+  const originalModule = jest.requireActual('../../services/redisLeakyBucket');
+  let userTokens: Map<string, number> = new Map();
+  
+  return {
+    ...originalModule,
+    setUserTokens: jest.fn(async (userId: string, tokenCount: number) => {
+      userTokens.set(userId, Math.min(tokenCount, originalModule.MAX_TOKENS));
+    }),
+    consumeToken: jest.fn(async (userId: string) => {
+      const tokens = userTokens.get(userId) || 0;
+      if (tokens <= 0) return false;
+      userTokens.set(userId, tokens - 1);
+      return true;
+    }),
+  };
+});
 
 interface TestContext extends Partial<Context> {
   state: {
@@ -36,7 +55,7 @@ describe('Leaky Bucket Middleware', () => {
   it('should return 429 when no tokens are available', async () => {
     const userId = 'test-user';
     ctx.state.user = { id: userId };
-    setUserTokens(userId, 0);
+    await setUserTokens(userId, 0);
 
     await leakyBucketMiddleware(ctx as Context, next);
 
@@ -48,7 +67,7 @@ describe('Leaky Bucket Middleware', () => {
   it('should call next when tokens are available', async () => {
     const userId = 'test-user';
     ctx.state.user = { id: userId };
-    setUserTokens(userId, 5);
+    await setUserTokens(userId, 5);
 
     await leakyBucketMiddleware(ctx as Context, next);
 
