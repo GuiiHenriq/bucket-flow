@@ -1,0 +1,294 @@
+{
+  "info": {
+    "_postman_id": "a8d3f7e2-5b2d-4f3a-9e9c-9b5e3d3e8f7a",
+    "name": "Leaky Bucket GraphQL API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleção para testes da API GraphQL do projeto Leaky Bucket"
+  },
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { register(input: { username: \\\"usuario_teste\\\", password: \\\"senha123\\\" }) { token user { id username } } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Registrar um novo usuário e obter token JWT"
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { login(input: { username: \\\"usuario_teste\\\", password: \\\"senha123\\\" }) { token user { id username } } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Fazer login e obter token JWT"
+          },
+          "response": []
+        }
+      ],
+      "description": "Operações de autenticação (registro e login)"
+    },
+    {
+      "name": "2. Tokens",
+      "item": [
+        {
+          "name": "Get Tokens",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { getTokens { tokens lastRefill } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Consultar o saldo de tokens do usuário"
+          },
+          "response": []
+        }
+      ],
+      "description": "Operações relacionadas a tokens"
+    },
+    {
+      "name": "3. PIX Transactions",
+      "item": [
+        {
+          "name": "Query PIX Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { queryPixKey(key: \\\"12345678900\\\") { success message key accountInfo { name bank accountType accountNumber } } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Consultar uma chave PIX"
+          },
+          "response": []
+        },
+        {
+          "name": "Query PIX Key (with Tokens)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { queryPixKey(key: \\\"12345678900\\\") { success message key accountInfo { name bank accountType accountNumber } } getTokens { tokens lastRefill } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Consultar uma chave PIX e obter o saldo de tokens atualizado"
+          },
+          "response": []
+        },
+        {
+          "name": "Query Invalid PIX Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { queryPixKey(key: \\\"invalid_key\\\") { success message key accountInfo { name bank accountType accountNumber } } getTokens { tokens lastRefill } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Consultar uma chave PIX inválida (consome token)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Operações de transação PIX"
+    },
+    {
+      "name": "4. User Info",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { me { id username } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Obter informações do usuário atual"
+          },
+          "response": []
+        }
+      ],
+      "description": "Operações relacionadas a informações do usuário"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Extrair e salvar o token JWT após login ou registro",
+          "const jsonData = pm.response.json();",
+          "if (jsonData && jsonData.data) {",
+          "    if (jsonData.data.login && jsonData.data.login.token) {",
+          "        pm.environment.set(\"token\", jsonData.data.login.token);",
+          "        console.log(\"Token salvo do login: \" + jsonData.data.login.token);",
+          "    } else if (jsonData.data.register && jsonData.data.register.token) {",
+          "        pm.environment.set(\"token\", jsonData.data.register.token);",
+          "        console.log(\"Token salvo do registro: \" + jsonData.data.register.token);",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": "seu_token_jwt_aqui",
+      "type": "string"
+    }
+  ]
+} 

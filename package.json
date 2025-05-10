@@ -9,7 +9,12 @@
     "backend:start": "cd backend && npm start",
     "backend:test": "cd backend && npm test",
     "backend:lint": "cd backend && npm run lint",
-    "backend:lint:fix": "cd backend && npm run lint:fix"
+    "backend:lint:fix": "cd backend && npm run lint:fix",
+    "k6:main": "k6 run load-tests/main.js",
+    "k6:api": "k6 run load-tests/api-performance.js",
+    "k6:auth": "k6 run load-tests/auth-test.js",
+    "k6:all": "npm run k6:main && npm run k6:api && npm run k6:auth",
+    "k6:leaky-bucket": "k6 run --tag scenario=leaky_bucket_test load-tests/main.js"
   },
   "keywords": [],
   "author": "",
