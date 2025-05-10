@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f9a399090453d01cb70339e4bf3e3316>>
+ * @generated SignedSource<<a599ea89f70e7bb5f1dac11192851ea0>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,10 +13,6 @@ export type PIXTransactionMutation$variables = {
   key: string;
 };
 export type PIXTransactionMutation$data = {
-  readonly getTokens: {
-    readonly lastRefill: string;
-    readonly tokens: number;
-  } | null | undefined;
   readonly queryPixKey: {
     readonly accountInfo: {
       readonly accountNumber: string | null | undefined;
@@ -119,31 +115,6 @@ v1 = [
       }
     ],
     "storageKey": null
-  },
-  {
-    "alias": null,
-    "args": null,
-    "concreteType": "TokenBucket",
-    "kind": "LinkedField",
-    "name": "getTokens",
-    "plural": false,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "tokens",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "lastRefill",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
   }
 ];
 return {
@@ -164,16 +135,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "750c9e9b14b4f285aaf388e73a672a26",
+    "cacheID": "a532f1d7c8cb93c69ba532c5f1270072",
     "id": null,
     "metadata": {},
     "name": "PIXTransactionMutation",
     "operationKind": "mutation",
-    "text": "mutation PIXTransactionMutation(\n  $key: String!\n) {\n  queryPixKey(key: $key) {\n    success\n    message\n    key\n    accountInfo {\n      name\n      bank\n      accountType\n      accountNumber\n    }\n  }\n  getTokens {\n    tokens\n    lastRefill\n  }\n}\n"
+    "text": "mutation PIXTransactionMutation(\n  $key: String!\n) {\n  queryPixKey(key: $key) {\n    success\n    message\n    key\n    accountInfo {\n      name\n      bank\n      accountType\n      accountNumber\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "634b07c138f65a297de7a0aa343810b2";
+(node as any).hash = "9affffbda4abea8ceb341c57eaf988d4";
 
 export default node;

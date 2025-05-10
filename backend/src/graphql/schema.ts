@@ -3,7 +3,8 @@ import {
   consumeToken,
   processQueryResult,
   getUserTokens,
-} from "../services/leakyBucket";
+  getAllUserTokens,
+} from "../services/redisLeakyBucket";
 import { register, login } from "../services/auth";
 
 export const typeDefs = gql`
@@ -20,6 +21,7 @@ export const typeDefs = gql`
   type TokenBucket {
     tokens: Int!
     lastRefill: String!
+    userId: String
   }
 
   input RegisterInput {
@@ -50,6 +52,7 @@ export const typeDefs = gql`
     hello: String
     me: User
     getTokens: TokenBucket
+    getAllTokens: [TokenBucket]
   }
 
   type Mutation {
@@ -104,18 +107,28 @@ interface AuthResponse {
   username: string;
 }
 
-const getTokensBucket = (context: any) => {
+const getTokensBucket = async (context: any) => {
   if (!context.user) {
     throw new Error("Authentication required");
   }
 
   const userId = context.user.id;
-  const tokenBucket = getUserTokens(userId);
+  const tokenBucket = await getUserTokens(userId);
 
   return {
     tokens: tokenBucket.tokens,
     lastRefill: tokenBucket.lastRefill.toISOString(),
+    userId: tokenBucket.userId,
   };
+};
+
+// Função para verificar se o usuário é admin
+// Na vida real, isso viria do modelo de usuário
+const isAdmin = (context: any): boolean => {
+  // Exemplo simples para fins de demonstração
+  // Em produção, isso dependeria de um campo no modelo de usuário ou outra lógica
+  const adminUserIds = ['admin', '1', 'admin-user'];
+  return context.user && adminUserIds.includes(context.user.id);
 };
 
 export const resolvers = {
@@ -127,8 +140,23 @@ export const resolvers = {
       }
       return context.user;
     },
-    getTokens: (_: any, __: any, context: any) => {
-      return getTokensBucket(context);
+    getTokens: async (_: any, __: any, context: any) => {
+      return await getTokensBucket(context);
+    },
+    // Nova consulta para painel administrativo
+    getAllTokens: async (_: any, __: any, context: any) => {
+      // Verificar se o usuário é um administrador
+      if (!isAdmin(context)) {
+        throw new Error("Admin privileges required");
+      }
+      
+      const buckets = await getAllUserTokens();
+      
+      return buckets.map(bucket => ({
+        userId: bucket.userId,
+        tokens: bucket.tokens,
+        lastRefill: bucket.lastRefill.toISOString(),
+      }));
     },
   },
   Mutation: {
@@ -172,21 +200,21 @@ export const resolvers = {
         },
       };
     },
-    queryPixKey: (_: any, { key }: { key: string }, context: any) => {
+    queryPixKey: async (_: any, { key }: { key: string }, context: any) => {
       const { user } = context;
 
       if (!user) {
         throw new Error("Authentication required");
       }
 
-      const hasToken = consumeToken(user.id);
+      const hasToken = await consumeToken(user.id);
       if (!hasToken) {
         throw new Error("Rate limit exceeded. Please try again later.");
       }
 
       const result = simulateExternalCall(key);
 
-      processQueryResult(user.id, result.success);
+      await processQueryResult(user.id, result.success);
 
       if (!result.success) {
         return {
@@ -202,8 +230,8 @@ export const resolvers = {
         accountInfo: result.data.accountInfo,
       };
     },
-    getTokens: (_: any, __: any, context: any) => {
-      return getTokensBucket(context);
+    getTokens: async (_: any, __: any, context: any) => {
+      return await getTokensBucket(context);
     },
   },
 };

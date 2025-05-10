@@ -32,22 +32,30 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const Dashboard = () => {
+  const [refreshKey, setRefreshKey] = useState(0);
+  
   const data = useLazyLoadQuery<AppGetTokensQueryType>(
     GetTokensQuery, 
     {}, 
-    { fetchPolicy: 'network-only' }
+    { fetchPolicy: 'network-only', fetchKey: refreshKey }
   );
   const navigate = useNavigate();
   
   const [tokens, setTokens] = useState<number>(data?.getTokens?.tokens ?? 0);
+
+  useEffect(() => {
+    if (data?.getTokens) {
+      setTokens(data.getTokens.tokens);
+    }
+  }, [data]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
   };
 
-  const handleTokensUpdated = (newTokens: number) => {
-    setTokens(newTokens);
+  const handleTokensUpdated = () => {
+    setRefreshKey(prev => prev + 1);
   };
 
   return (
