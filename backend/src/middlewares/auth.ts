@@ -13,11 +13,8 @@ interface GraphQLRequestBody {
 export const authMiddleware = async (ctx: Context, next: Next) => {
   try {
     if (
-      ctx.path === "/api/login" ||
-      ctx.path === "/api/register" ||
       ctx.method === "OPTIONS" ||
-      (ctx.path === "/graphql" && (ctx.request.body as GraphQLRequestBody)?.query?.includes("mutation AuthMutationsLoginMutation")) ||
-      (ctx.path === "/graphql" && (ctx.request.body as GraphQLRequestBody)?.query?.includes("mutation AuthMutationsRegisterMutation"))
+      (ctx.path === "/graphql" && isAuthQuery(ctx))
     ) {
       return await next();
     }
@@ -32,7 +29,7 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
     const token = authHeader.substring(7);
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
 
-    const user = await User.findById(decoded.id) as IUser;
+    const user = (await User.findById(decoded.id)) as IUser;
     if (!user) {
       ctx.status = 401;
       ctx.body = { error: "Invalid token" };
@@ -41,7 +38,7 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
 
     ctx.state.user = {
       id: (user._id as Types.ObjectId).toString(),
-      username: user.username
+      username: user.username,
     };
 
     await next();
@@ -50,3 +47,13 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
     ctx.body = { error: "Invalid token" };
   }
 };
+
+function isAuthQuery(ctx: Context): boolean {
+  const body = ctx.request.body as GraphQLRequestBody;
+  const query = body?.query || "";
+
+  return (
+    query.includes("mutation AuthMutationsLoginMutation") ||
+    query.includes("mutation AuthMutationsRegisterMutation")
+  );
+}

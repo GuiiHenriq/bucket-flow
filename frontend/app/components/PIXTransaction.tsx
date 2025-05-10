@@ -3,7 +3,7 @@ import { graphql, useMutation } from "react-relay";
 import type { PIXTransactionMutation } from "../__generated__/PIXTransactionMutation.graphql";
 
 interface PIXTransactionProps {
-  onTransaction?: () => void;
+  onTokensUpdated?: (tokens: number) => void;
 }
 
 const PIXQueryMutation = graphql`
@@ -19,10 +19,14 @@ const PIXQueryMutation = graphql`
         accountNumber
       }
     }
+    getTokens {
+      tokens
+      lastRefill
+    }
   }
 `;
 
-export function PIXTransaction({ onTransaction }: PIXTransactionProps) {
+export function PIXTransaction({ onTokensUpdated }: PIXTransactionProps) {
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
   const [result, setResult] = useState<any>(null);
@@ -40,15 +44,18 @@ export function PIXTransaction({ onTransaction }: PIXTransactionProps) {
       onCompleted: (response, errors) => {
         if (errors) {
           setError(errors[0].message);
-          onTransaction && onTransaction();
+          if (response.getTokens && onTokensUpdated) {
+            onTokensUpdated(response.getTokens.tokens);
+          }
           return;
         }
         setResult(response.queryPixKey);
-        onTransaction && onTransaction();
+        if (response.getTokens && onTokensUpdated) {
+          onTokensUpdated(response.getTokens.tokens);
+        }
       },
       onError: (error) => {
         setError(error.message);
-        onTransaction && onTransaction();
       },
     });
   };
@@ -121,12 +128,12 @@ export function PIXTransaction({ onTransaction }: PIXTransactionProps) {
               <div className="mt-2 text-sm text-green-700">
                 <p>Success: {result.success ? "Yes" : "No"}</p>
                 <p>Message: {result.message}</p>
-                {result.data && (
+                {result.accountInfo && (
                   <div className="mt-2">
-                    <p>Name: {result.data.name}</p>
-                    <p>Bank: {result.data.bank}</p>
-                    <p>Account Type: {result.data.accountType}</p>
-                    <p>Account Number: {result.data.accountNumber}</p>
+                    <p>Name: {result.accountInfo.name}</p>
+                    <p>Bank: {result.accountInfo.bank}</p>
+                    <p>Account Type: {result.accountInfo.accountType}</p>
+                    <p>Account Number: {result.accountInfo.accountNumber}</p>
                   </div>
                 )}
               </div>

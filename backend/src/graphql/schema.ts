@@ -1,5 +1,9 @@
 import { gql } from "apollo-server-koa";
-import { consumeToken, processQueryResult } from "../services/leakyBucket";
+import {
+  consumeToken,
+  processQueryResult,
+  getUserTokens,
+} from "../services/leakyBucket";
 import { register, login } from "../services/auth";
 
 export const typeDefs = gql`
@@ -11,6 +15,11 @@ export const typeDefs = gql`
   type AuthPayload {
     token: String!
     user: User!
+  }
+
+  type TokenBucket {
+    tokens: Int!
+    lastRefill: String!
   }
 
   input RegisterInput {
@@ -40,12 +49,14 @@ export const typeDefs = gql`
   type Query {
     hello: String
     me: User
+    getTokens: TokenBucket
   }
 
   type Mutation {
     register(input: RegisterInput!): AuthPayload!
     login(input: LoginInput!): AuthPayload!
     queryPixKey(key: String!): PixKeyResponse
+    getTokens: TokenBucket
   }
 `;
 
@@ -93,6 +104,20 @@ interface AuthResponse {
   username: string;
 }
 
+const getTokensBucket = (context: any) => {
+  if (!context.user) {
+    throw new Error("Authentication required");
+  }
+
+  const userId = context.user.id;
+  const tokenBucket = getUserTokens(userId);
+
+  return {
+    tokens: tokenBucket.tokens,
+    lastRefill: tokenBucket.lastRefill.toISOString(),
+  };
+};
+
 export const resolvers = {
   Query: {
     hello: () => "Hello World!",
@@ -102,11 +127,19 @@ export const resolvers = {
       }
       return context.user;
     },
+    getTokens: (_: any, __: any, context: any) => {
+      return getTokensBucket(context);
+    },
   },
   Mutation: {
-    register: async (_: any, { input }: { input: { username: string; password: string } }) => {
-      const response = await register({ request: { body: input } } as any) as AuthResponse;
-      
+    register: async (
+      _: any,
+      { input }: { input: { username: string; password: string } }
+    ) => {
+      const response = (await register({
+        request: { body: input },
+      } as any)) as AuthResponse;
+
       if (!response) {
         throw new Error("Registration failed");
       }
@@ -119,9 +152,14 @@ export const resolvers = {
         },
       };
     },
-    login: async (_: any, { input }: { input: { username: string; password: string } }) => {
-      const response = await login({ request: { body: input } } as any) as AuthResponse;
-      
+    login: async (
+      _: any,
+      { input }: { input: { username: string; password: string } }
+    ) => {
+      const response = (await login({
+        request: { body: input },
+      } as any)) as AuthResponse;
+
       if (!response) {
         throw new Error("Login failed");
       }
@@ -163,6 +201,9 @@ export const resolvers = {
         key: result.data.key,
         accountInfo: result.data.accountInfo,
       };
+    },
+    getTokens: (_: any, __: any, context: any) => {
+      return getTokensBucket(context);
     },
   },
 };
