@@ -1,5 +1,5 @@
 import { Context, Next } from "koa";
-import { consumeToken } from "../services/leakyBucket";
+import { consumeToken } from "../services/redisLeakyBucket";
 
 export const leakyBucketMiddleware = async (ctx: Context, next: Next) => {
   const userId = ctx.state.user?.id;
@@ -10,7 +10,7 @@ export const leakyBucketMiddleware = async (ctx: Context, next: Next) => {
     return;
   }
 
-  const hasToken = consumeToken(userId);
+  const hasToken = await consumeToken(userId);
 
   if (!hasToken) {
     ctx.status = 429;
