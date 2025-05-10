@@ -19,10 +19,6 @@ const PIXQueryMutation = graphql`
         accountNumber
       }
     }
-    getTokens {
-      tokens
-      lastRefill
-    }
   }
 `;
 
@@ -44,14 +40,12 @@ export function PIXTransaction({ onTokensUpdated }: PIXTransactionProps) {
       onCompleted: (response, errors) => {
         if (errors) {
           setError(errors[0].message);
-          if (response.getTokens && onTokensUpdated) {
-            onTokensUpdated(response.getTokens.tokens);
-          }
           return;
         }
         setResult(response.queryPixKey);
-        if (response.getTokens && onTokensUpdated) {
-          onTokensUpdated(response.getTokens.tokens);
+        
+        if (onTokensUpdated) {
+          onTokensUpdated(0);
         }
       },
       onError: (error) => {

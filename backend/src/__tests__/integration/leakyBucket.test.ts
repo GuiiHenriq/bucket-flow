@@ -1,7 +1,7 @@
 import request from "supertest";
 import { createServer } from "http";
 import { app } from "../../app";
-import { setUserTokens } from "../../services/leakyBucket";
+import { setUserTokens } from "../../services/redisLeakyBucket";
 import jwt from "jsonwebtoken";
 import { User } from "../../models/User";
 
@@ -38,8 +38,8 @@ describe("Leaky Bucket Integration Tests", () => {
     server.close(done);
   });
 
-  beforeEach(() => {
-    setUserTokens(TEST_USER_ID, 10);
+  beforeEach(async () => {
+    await setUserTokens(TEST_USER_ID, 10);
     jest.spyOn(global.Math, "random").mockRestore();
   });
 
@@ -86,7 +86,7 @@ describe("Leaky Bucket Integration Tests", () => {
     });
 
     it("should return 429 when rate limit is exceeded", async () => {
-      setUserTokens(TEST_USER_ID, 0);
+      await setUserTokens(TEST_USER_ID, 0);
       const response = await makeAuthenticatedRequest(
         "post",
         "/api/pix/query",

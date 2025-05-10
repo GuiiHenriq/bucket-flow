@@ -1,9 +1,12 @@
-import { resetAllTokens } from "../services/leakyBucket";
+import { resetAllTokens } from "../services/redisLeakyBucket";
 
-beforeEach(() => {
-  resetAllTokens();
+beforeEach(async () => {
+  await resetAllTokens();
 });
 
 jest.mock("node-cron", () => ({
   schedule: jest.fn(),
 }));
+
+// Mock Redis
+jest.mock('ioredis');
