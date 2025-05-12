@@ -1,78 +1,63 @@
-# Leaky Bucket API - Rate Limiting with GraphQL
+# Leaky Bucket - Woovi Challenge
 
-This project shows a full backend and frontend system using GraphQL, with a rate limiting system based on the Leaky Bucket algorithm. The system includes authentication (login/register), PIX transactions, and request token control.
+Um sistema de Leaky Bucket para limitar requisições implementado com consulta GraphQL usando Node.js e consumido no frontend usando React.
 
-## Technologies Used
+## Tecnologias
 
-- **Backend**: Node.js, TypeScript, Koa.js, Apollo Server (GraphQL)
+- **Backend**: Node.js, TypeScript, Koa.js, Apollo Server
 - **Frontend**: React, TypeScript, Relay, TailwindCSS
 - **Container**: Docker
 
-## System Overview
+## Visão Geral
 
-The system uses a token-based rate limiting:
+Sistema de limitação baseado em tokens:
 
-- Each user has a maximum of 10 tokens
-- Failed requests use 1 token
-- Successful requests do not use tokens
-- When tokens are 0, new requests are blocked
-- Every 1 hour, 1 token is added
+- Máximo de 10 tokens por usuário
+- Requisições com falha consomem 1 token
+- Requisições bem-sucedidas não consomem tokens
+- Quando tokens = 0, novas requisições são bloqueadas
+- A cada 1 hora, 1 token é adicionado
 
-## Running with Docker
+## Executando com Docker
 
-### Requirements
+### Requisitos
 
 - Docker
 - Docker Compose
 
-### Steps
+### Passos
 
-1. **Clone the repository**:
+1. **Clone o repositório**:
 
 ```bash
 git clone https://github.com/GuiiHenriq/woovi-challenge-leaky-bucket
 cd leaky-bucket
 ```
 
-2. **Start the containers**:
+2. **Inicie os containers**:
 
 ```bash
 docker-compose up
 ```
 
-This will start:
+Portas:
+- Backend: 3000
+- Frontend: 5173
+- MongoDB: 27017
 
-- Backend on port 3000
-- Frontend on port 5173
-- MongoDB on port 27017
-
-3. **Open the app**:
-
+3. **Acesse**:
 - Frontend: [http://localhost:5173](http://localhost:5173)
 - GraphQL API: [http://localhost:3000/graphql](http://localhost:3000/graphql)
 
-## Testing the GraphQL API
+## Exemplos de Consultas GraphQL
 
-You can test the GraphQL API using tools like Postman or Insomnia.
-
-### Setting up Postman
-
-1. Create a new request in Postman and select POST method
-2. Set the URL to `http://localhost:3000/graphql`
-3. In "Headers", add:
-   - Key: `Content-Type`, Value: `application/json`
-4. For authenticated requests, add:
-   - Key: `Authorization`, Value: `Bearer your_token_here`
-
-### GraphQL Query Examples
-
-#### Register User
+### Registrar Usuário
 
 ```graphql
 mutation {
   register(input: {
-    username: "test_user",
-    password: "password123"
+    username: "usuario_teste",
+    password: "senha123"
   }) {
     token
     user {
@@ -83,13 +68,13 @@ mutation {
 }
 ```
 
-#### Login User
+### Login
 
 ```graphql
 mutation {
   login(input: {
-    username: "test_user",
-    password: "password123"
+    username: "usuario_teste",
+    password: "senha123"
   }) {
     token
     user {
@@ -100,7 +85,7 @@ mutation {
 }
 ```
 
-#### Get Token Balance
+### Saldo de Tokens
 
 ```graphql
 query {
@@ -111,9 +96,9 @@ query {
 }
 ```
 
-**Note**: This query needs authentication.
+**OBS**: Requer autenticação.
 
-#### Make PIX Transaction
+### Transação PIX
 
 ```graphql
 mutation {
@@ -128,74 +113,48 @@ mutation {
       accountNumber
     }
   }
-  getTokens {
-    tokens
-    lastRefill
-  }
 }
 ```
 
-**Note**: This query needs authentication.
+**OBS**: Requer autenticação.
 
-#### Get User Info
+### Autenticação
 
-```graphql
-query {
-  me {
-    id
-    username
-  }
-}
-```
-
-**Note**: This query needs authentication.
-
-### Authentication
-
-For endpoints that need authentication:
-
-1. First, login or register to get a JWT token
-2. Add the token in your request headers:
+Para endpoints que precisam de autenticação:
 
 ```
-Authorization: Bearer your_token_here
+Authorization: Bearer seu_token_aqui
 ```
 
-## Project Structure
+## Atomicidade
 
-```
-leaky-bucket/
-├── backend/
-│   ├── src/
-│   │   ├── graphql/       # GraphQL definitions
-│   │   ├── middlewares/   # Koa middlewares
-│   │   ├── models/        # Data models
-│   │   └── services/      # Services and business logic
-├── frontend/
-│   ├── app/
-│   │   ├── components/    # React components
-└── docker-compose.yml     # Docker config
-```
+Foi implementado atomicidade usando o Redis:
 
-## Postman Collection
+### Exemplo: Consumo de Token
 
-In the `postman/` folder you will find a Postman collection with all examples ready to use.
+```typescript
+export const consumeToken = async (userId: string): Promise<boolean> => {
+  const bucketKey = getBucketKey(userId);
 
-## Development
+  const script = `
+    local tokens = tonumber(redis.call('hget', KEYS[1], 'tokens') or 0)
+    if tokens <= 0 then
+      return 0
+    end
+    redis.call('hset', KEYS[1], 'tokens', tokens - 1)
+    return 1
+  `;
 
-To develop locally without Docker:
-
-1. Set up MongoDB locally or use a remote service
-2. In the `backend/` folder:
-
-```bash
-npm install
-npm run dev
+  const result = await redisClient.eval(script, 1, bucketKey);
+  return result === 1;
+};
 ```
 
-3. In the `frontend/` folder:
+O script Lua garante que:
+1. Verificamos disponibilidade de tokens
+2. Decrementamos o contador
+3. Tudo em uma única operação atômica
 
-```bash
-npm install
-npm run dev
-```
+## Concorrência
+
+## Estimativa de Custo do Banco de Dados
