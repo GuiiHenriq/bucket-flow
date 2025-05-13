@@ -10,6 +10,7 @@ import { PIXTransaction } from './components/PIXTransaction';
 import { GraphQLResponseViewer } from './components/GraphQLResponseViewer';
 import TokenCounter from './components/TokenCounter';
 import Toast from './components/Toast';
+import { ValidWalletsInfo } from './components/ValidWalletsInfo';
 import { useEffect, useState, Suspense } from 'react';
 import { networkLogger } from './relay';
 import { MAX_TOKENS } from './components/TokenCounter';
@@ -68,28 +69,45 @@ const Dashboard = () => {
     setRefreshKey(prev => prev + 1);
   };
 
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
-      <div className="w-full flex justify-end items-center p-4 bg-white shadow-sm">
-        <div className="flex items-center">
+    <div className="min-h-screen bg-gray-100">
+      <div className="w-full flex justify-between items-center p-4 bg-white shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-800">PIX Dashboard</h1>
+        <div className="flex space-x-4">
           <button
-            onClick={() => navigate('/admin')}
+            onClick={handleRefresh}
             className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
           >
-            Admin
+            Refresh
           </button>
           <button
             onClick={handleLogout}
-            className="ml-4 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium border border-gray-300"
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium border border-gray-300"
           >
             Logout
           </button>
         </div>
       </div>
-      <div className="flex flex-col items-center justify-center gap-8 w-full max-w-lg mx-auto">
-        <TokenCounter current={tokens} max={MAX_TOKENS} />
-        <h1 className="text-3xl font-bold text-center mb-4">PIX Transaction</h1>
-        <PIXTransaction onTokensUpdated={handleTokensUpdated} />
+
+      <div className="container mx-auto py-8 px-4">
+        <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold">Available Tokens</h2>
+            <TokenCounter current={tokens} max={MAX_TOKENS} />
+          </div>
+        </div>
+
+        <div className="bg-white shadow-lg rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-6">PIX Transaction</h2>
+          <ValidWalletsInfo />
+          <div className="mt-6">
+            <PIXTransaction onTokensUpdated={handleTokensUpdated} />
+          </div>
+        </div>
       </div>
     </div>
   );
