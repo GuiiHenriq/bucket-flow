@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
+import { AdminLogin } from './components/auth/AdminLogin';
+import { AdminDashboard } from './components/AdminDashboard';
 import { RelayEnvironmentProvider, useLazyLoadQuery } from 'react-relay';
 import { environment } from './relay';
 import { PIXTransaction } from './components/PIXTransaction';
@@ -27,6 +29,14 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token');
   if (!token) {
     return <Navigate to="/" />;
+  }
+  return <>{children}</>;
+};
+
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const adminToken = localStorage.getItem('adminToken');
+  if (!adminToken || adminToken !== 'admin-session') {
+    return <Navigate to="/admin" />;
   }
   return <>{children}</>;
 };
@@ -61,12 +71,20 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
       <div className="w-full flex justify-end items-center p-4 bg-white shadow-sm">
-        <button
-          onClick={handleLogout}
-          className="ml-4 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium border border-gray-300"
-        >
-          Logout
-        </button>
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate('/admin')}
+            className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
+          >
+            Admin
+          </button>
+          <button
+            onClick={handleLogout}
+            className="ml-4 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium border border-gray-300"
+          >
+            Logout
+          </button>
+        </div>
       </div>
       <div className="flex flex-col items-center justify-center gap-8 w-full max-w-lg mx-auto">
         <TokenCounter current={tokens} max={MAX_TOKENS} />
@@ -83,6 +101,23 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <Suspense fallback={
+                <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+                  <div className="w-48 h-28 flex items-center justify-center text-gray-400 animate-pulse">
+                    Loading admin data...
+                  </div>
+                </div>
+              }>
+                <AdminDashboard />
+              </Suspense>
+            </AdminRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={
