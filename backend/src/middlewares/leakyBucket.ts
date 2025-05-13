@@ -1,5 +1,5 @@
 import { Context, Next } from "koa";
-import { consumeToken } from "../services/redisLeakyBucket";
+import { safeConsumeToken, safeProcessQueryResult } from "../services/concurrentLeakyBucket";
 
 export const leakyBucketMiddleware = async (ctx: Context, next: Next) => {
   const userId = ctx.state.user?.id;
@@ -10,7 +10,7 @@ export const leakyBucketMiddleware = async (ctx: Context, next: Next) => {
     return;
   }
 
-  const hasToken = await consumeToken(userId);
+  const hasToken = await safeConsumeToken(userId);
 
   if (!hasToken) {
     ctx.status = 429;
@@ -18,5 +18,13 @@ export const leakyBucketMiddleware = async (ctx: Context, next: Next) => {
     return;
   }
 
-  await next();
+  try {
+    await next();
+    
+    safeProcessQueryResult(userId, true).catch(err => {
+      console.error("Error processing query result:", err);
+    });
+  } catch (error) {
+    throw error;
+  }
 };
