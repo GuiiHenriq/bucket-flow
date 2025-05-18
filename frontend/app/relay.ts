@@ -28,12 +28,20 @@ export const networkLogger = {
 
 async function fetchGraphQL(operation: RequestParameters, variables: Variables) {
   const token = localStorage.getItem('token');
+  const adminToken = localStorage.getItem('adminToken');
+  
+  let authHeader = null;
+  if (adminToken && adminToken === 'admin-session') {
+    authHeader = 'Bearer admin';
+  } else if (token) {
+    authHeader = `Bearer ${token}`;
+  }
   
   const response = await fetch('http://localhost:3000/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      ...(authHeader ? { 'Authorization': authHeader } : {})
     },
     body: JSON.stringify({
       query: operation.text,
