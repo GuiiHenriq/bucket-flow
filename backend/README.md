@@ -69,7 +69,7 @@ npm run lint:fix
 Crie um arquivo `.env` na raiz do backend com essas variáveis.
 
 ```
-JWT_SECRET=sua_senha_secreta
+JWT_SECRET=token
 PORT=3000
 ```
 

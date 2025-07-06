@@ -1,10 +1,10 @@
+const TEST_JWT_SECRET = 'integration-test-secret-key';
+process.env.JWT_SECRET = TEST_JWT_SECRET;
+
 import { Context, Request } from 'koa';
 import { authMiddleware } from '../../middlewares/auth';
 import jwt from 'jsonwebtoken';
 import { User } from '../../models/User';
-
-const TEST_JWT_SECRET = 'integration-test-secret-key';
-process.env.JWT_SECRET = TEST_JWT_SECRET;
 
 jest.mock('../../models/User', () => ({
   User: {
@@ -66,7 +66,7 @@ describe('Auth Middleware', () => {
   it('should allow access to GraphQL login mutation', async () => {
     ctx.path = '/graphql';
     ctx.request.body = {
-      query: 'mutation AuthMutationsLoginMutation',
+      query: 'mutation { login(input: { username: "a", password: "b" }) { token user { id username } } }',
     };
     await authMiddleware(ctx as unknown as Context, next);
     expect(next).toHaveBeenCalled();
@@ -75,7 +75,7 @@ describe('Auth Middleware', () => {
   it('should allow access to GraphQL register mutation', async () => {
     ctx.path = '/graphql';
     ctx.request.body = {
-      query: 'mutation AuthMutationsRegisterMutation',
+      query: 'mutation { register(input: { username: "a", password: "b" }) { token user { id username } } }',
     };
     await authMiddleware(ctx as unknown as Context, next);
     expect(next).toHaveBeenCalled();

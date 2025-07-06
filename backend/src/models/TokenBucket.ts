@@ -4,7 +4,7 @@ export interface ITokenBucket extends Document {
   userId: string;
   tokens: number;
   lastRefill: Date;
-  version: number; // For optimistic concurrency control
+  version: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,7 +38,6 @@ const TokenBucketSchema = new Schema<ITokenBucket>(
   }
 );
 
-// Add pre-save hook to increment version
 TokenBucketSchema.pre('save', function (next) {
   this.version++;
   next();

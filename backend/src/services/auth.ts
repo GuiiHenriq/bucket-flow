@@ -53,7 +53,7 @@ export const register = async (ctx: Context | { request: { body: RegisterInput }
       username: user.username
     };
   } catch (error) {
-    if ('status' in ctx) {
+    if ('status' in ctx && (ctx as Context).status === 200) {
       (ctx as Context).status = 500;
       (ctx as Context).body = { error: "Error creating user" };
     }
@@ -97,7 +97,7 @@ export const login = async (ctx: Context | { request: { body: LoginInput } }): P
       username: user.username
     };
   } catch (error) {
-    if ('status' in ctx) {
+    if ('status' in ctx && (ctx as Context).status === 200) {
       (ctx as Context).status = 500;
       (ctx as Context).body = { error: "Error during login" };
     }

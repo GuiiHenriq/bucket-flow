@@ -27,6 +27,10 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
     return await next();
   }
 
+  if (ctx.path === "/api/login" || ctx.path === "/api/register") {
+    return await next();
+  }
+
   if (ctx.path === "/graphql") {
     const body = ctx.request.body as GraphQLRequestBody;
     const query = body?.query || "";

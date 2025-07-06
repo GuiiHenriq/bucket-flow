@@ -43,8 +43,7 @@ describe('Auth Service', () => {
     it('should return error if username already exists', async () => {
       (User.findOne as jest.Mock).mockResolvedValue({ username });
 
-      await register(mockCtx);
-
+      await expect(register(mockCtx)).rejects.toThrow('Username already exists');
       expect(mockCtx.status).toBe(400);
       expect(mockCtx.body).toEqual({ error: 'Username already exists' });
     });
@@ -80,8 +79,7 @@ describe('Auth Service', () => {
     it('should return error for non-existent user', async () => {
       (User.findOne as jest.Mock).mockResolvedValue(null);
 
-      await login(mockCtx);
-
+      await expect(login(mockCtx)).rejects.toThrow('Invalid credentials');
       expect(mockCtx.status).toBe(401);
       expect(mockCtx.body).toEqual({ error: 'Invalid credentials' });
     });
@@ -90,8 +88,7 @@ describe('Auth Service', () => {
       (User.findOne as jest.Mock).mockResolvedValue(mockUser);
       mockUser.comparePassword.mockResolvedValue(false);
 
-      await login(mockCtx);
-
+      await expect(login(mockCtx)).rejects.toThrow('Invalid credentials');
       expect(mockCtx.status).toBe(401);
       expect(mockCtx.body).toEqual({ error: 'Invalid credentials' });
     });
