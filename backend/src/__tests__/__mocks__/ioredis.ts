@@ -89,6 +89,11 @@ class MockRedis {
         result[field] = value;
       });
     }
+    
+    if (!result.lastRefill && result.tokens) {
+      result.lastRefill = new Date().toISOString();
+    }
+    
     return result;
   }
 

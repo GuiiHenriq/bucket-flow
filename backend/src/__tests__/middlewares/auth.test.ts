@@ -1,9 +1,10 @@
+const TEST_JWT_SECRET = 'integration-test-secret-key';
+process.env.JWT_SECRET = TEST_JWT_SECRET;
+
 import { Context, Request } from 'koa';
 import { authMiddleware } from '../../middlewares/auth';
 import jwt from 'jsonwebtoken';
 import { User } from '../../models/User';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 jest.mock('../../models/User', () => ({
   User: {
@@ -65,7 +66,7 @@ describe('Auth Middleware', () => {
   it('should allow access to GraphQL login mutation', async () => {
     ctx.path = '/graphql';
     ctx.request.body = {
-      query: 'mutation AuthMutationsLoginMutation',
+      query: 'mutation { login(input: { username: "a", password: "b" }) { token user { id username } } }',
     };
     await authMiddleware(ctx as unknown as Context, next);
     expect(next).toHaveBeenCalled();
@@ -74,7 +75,7 @@ describe('Auth Middleware', () => {
   it('should allow access to GraphQL register mutation', async () => {
     ctx.path = '/graphql';
     ctx.request.body = {
-      query: 'mutation AuthMutationsRegisterMutation',
+      query: 'mutation { register(input: { username: "a", password: "b" }) { token user { id username } } }',
     };
     await authMiddleware(ctx as unknown as Context, next);
     expect(next).toHaveBeenCalled();
@@ -104,7 +105,7 @@ describe('Auth Middleware', () => {
   });
 
   it('should return 401 when user is not found', async () => {
-    const token = jwt.sign({ id: userId }, JWT_SECRET);
+    const token = jwt.sign({ id: userId }, TEST_JWT_SECRET);
     ctx.headers.authorization = `Bearer ${token}`;
     (User.findById as jest.Mock).mockResolvedValue(null);
 
@@ -115,7 +116,7 @@ describe('Auth Middleware', () => {
   });
 
   it('should set user in context when token is valid', async () => {
-    const token = jwt.sign({ id: userId }, JWT_SECRET);
+    const token = jwt.sign({ id: userId }, TEST_JWT_SECRET);
     ctx.headers.authorization = `Bearer ${token}`;
     (User.findById as jest.Mock).mockResolvedValue({
       _id: userId,

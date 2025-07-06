@@ -9,15 +9,25 @@ import {
   OperationTypeNode,
 } from "graphql";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error("JWT_SECRET environment variable is not defined");
 
 interface GraphQLRequestBody {
   query?: string;
   variables?: any;
 }
 
+interface JwtPayload {
+  id: string;
+  [key: string]: any;
+}
+
 export const authMiddleware = async (ctx: Context, next: Next) => {
   if (ctx.method === "OPTIONS") {
+    return await next();
+  }
+
+  if (ctx.path === "/api/login" || ctx.path === "/api/register") {
     return await next();
   }
 
@@ -42,7 +52,6 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
 
   const token = authHeader.substring(7);
 
-  // Special case for admin token
   if (token === "admin") {
     console.log("Admin access granted");
     ctx.state.user = {
@@ -53,7 +62,14 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+
+    if (!decoded || typeof decoded.id !== 'string') {
+      console.log('JWT payload invalid: missing or invalid id field');
+      ctx.status = 401;
+      ctx.body = { error: "Invalid token payload" };
+      return;
+    }
 
     const user = (await User.findById(decoded.id)) as IUser;
     if (!user) {

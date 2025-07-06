@@ -1,3 +1,6 @@
+const TEST_JWT_SECRET = 'integration-test-secret-key';
+process.env.JWT_SECRET = TEST_JWT_SECRET;
+
 import request from "supertest";
 import { createServer } from "http";
 import { app } from "../../app";
@@ -5,7 +8,6 @@ import { setUserTokens } from "../../services/redisLeakyBucket";
 import jwt from "jsonwebtoken";
 import { User } from "../../models/User";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const TEST_USER_ID = "test-user";
 
 jest.mock("../../models/User", () => ({
@@ -28,7 +30,7 @@ describe("Leaky Bucket Integration Tests", () => {
   let server: ReturnType<typeof createServer>;
 
   beforeAll(() => {
-    authToken = jwt.sign({ id: TEST_USER_ID }, JWT_SECRET, {
+    authToken = jwt.sign({ id: TEST_USER_ID }, TEST_JWT_SECRET, {
       expiresIn: "24h",
     });
     server = app.listen();
@@ -43,68 +45,130 @@ describe("Leaky Bucket Integration Tests", () => {
     jest.spyOn(global.Math, "random").mockRestore();
   });
 
-  const makeAuthenticatedRequest = (
-    method: "get" | "post",
-    path: string,
-    data?: any
+  const makeGraphQLRequest = (
+    query: string,
+    variables: any = {},
+    token?: string
   ) => {
     const req = request(server)
-      [method](path)
-      .set("Authorization", `Bearer ${authToken}`);
-    return data ? req.send(data) : req;
+      .post("/graphql")
+      .send({
+        query,
+        variables,
+      });
+
+    if (token) {
+      req.set("Authorization", `Bearer ${token}`);
+    }
+
+    return req;
   };
 
-  describe("GET /api/tokens", () => {
+  describe("GraphQL getTokens", () => {
     it("should return token information for authenticated user", async () => {
-      const response = await makeAuthenticatedRequest("get", "/api/tokens");
+      const query = `
+        query {
+          getTokens {
+            tokens
+            lastRefill
+          }
+        }
+      `;
+
+      const response = await makeGraphQLRequest(query, {}, authToken);
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      expect(response.body.data.getTokens).toEqual({
         tokens: 10,
         lastRefill: expect.any(String),
       });
     });
 
     it("should return 401 without authentication", async () => {
-      const response = await request(server).get("/api/tokens");
+      const query = `
+        query {
+          getTokens {
+            tokens
+            lastRefill
+          }
+        }
+      `;
+
+      const response = await makeGraphQLRequest(query);
       expect(response.status).toBe(401);
       expect(response.body).toEqual({ error: "Authentication required" });
     });
   });
 
-  describe("POST /api/pix/query", () => {
+  describe("GraphQL queryPixKey", () => {
     const testKey = "12345678900";
 
     it("should process query when tokens are available", async () => {
       jest.spyOn(global.Math, "random").mockReturnValue(0.7);
-      const response = await makeAuthenticatedRequest(
-        "post",
-        "/api/pix/query",
-        { key: testKey }
+      
+      const query = `
+        mutation QueryPixKey($key: String!) {
+          queryPixKey(key: $key) {
+            success
+            message
+          }
+        }
+      `;
+
+      const response = await makeGraphQLRequest(
+        query,
+        { key: testKey },
+        authToken
       );
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("success", true);
+      expect(response.body.data.queryPixKey).toHaveProperty("success", true);
     });
 
-    it("should return 429 when rate limit is exceeded", async () => {
+    it("should return rate limit error when tokens are exhausted", async () => {
       await setUserTokens(TEST_USER_ID, 0);
-      const response = await makeAuthenticatedRequest(
-        "post",
-        "/api/pix/query",
-        { key: testKey }
+      
+      const query = `
+        mutation QueryPixKey($key: String!) {
+          queryPixKey(key: $key) {
+            success
+            message
+          }
+        }
+      `;
+
+      const response = await makeGraphQLRequest(
+        query,
+        { key: testKey },
+        authToken
       );
-      expect(response.status).toBe(429);
-      expect(response.body).toEqual({
-        error: "Rate limit exceeded. Please try again later.",
-      });
+      expect(response.status).toBe(200);
+      expect(response.body.errors).toBeDefined();
+      expect(response.body.errors[0].message).toBe("Rate limit exceeded. Please try again later.");
     });
 
     it("should maintain token count after query", async () => {
       jest.spyOn(global.Math, "random").mockReturnValue(0.7);
-      await makeAuthenticatedRequest("post", "/api/pix/query", {
-        key: testKey,
-      });
-      const response = await makeAuthenticatedRequest("get", "/api/tokens");
-      expect(response.body.tokens).toBe(10);
+      
+      const queryPixKey = `
+        mutation QueryPixKey($key: String!) {
+          queryPixKey(key: $key) {
+            success
+            message
+          }
+        }
+      `;
+
+      const getTokensQuery = `
+        query {
+          getTokens {
+            tokens
+            lastRefill
+          }
+        }
+      `;
+
+      await makeGraphQLRequest(queryPixKey, { key: testKey }, authToken);
+      const response = await makeGraphQLRequest(getTokensQuery, {}, authToken);
+      expect(response.body.data.getTokens.tokens).toBe(10);
     });
   });
 });

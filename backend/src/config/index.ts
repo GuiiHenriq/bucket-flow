@@ -3,7 +3,7 @@ export const config = {
     port: process.env.PORT || 3000,
   },
   jwt: {
-    secret: process.env.JWT_SECRET || "your-secret-key",
+    secret: process.env.JWT_SECRET,
     expiresIn: "24h",
   },
   leakyBucket: {
