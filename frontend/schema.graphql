@@ -1,0 +1,53 @@
+type PixKeyResponse {
+    success: Boolean!
+    message: String
+    key: String
+    accountInfo: AccountInfo
+  }
+
+  type AccountInfo {
+    name: String
+    bank: String
+    accountType: String
+    accountNumber: String
+  }
+
+  type User {
+    id: ID!
+    username: String!
+  }
+
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
+
+  type TokenBucket {
+    tokens: Int!
+    lastRefill: String!
+    userId: String
+  }
+
+  input RegisterInput {
+    username: String!
+    password: String!
+  }
+
+  input LoginInput {
+    username: String!
+    password: String!
+  }
+
+  type Query {
+    hello: String
+    me: User
+    getTokens: TokenBucket
+    getAllTokens: [TokenBucket]
+  }
+
+  type Mutation {
+    queryPixKey(key: String!): PixKeyResponse
+    register(input: RegisterInput!): AuthPayload!
+    login(input: LoginInput!): AuthPayload!
+    getTokens: TokenBucket
+  }
