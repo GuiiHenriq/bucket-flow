@@ -1,60 +1,60 @@
 # Leaky Bucket - Woovi Challenge
 
-Um sistema de Leaky Bucket para limitar requisições implementado com consulta GraphQL usando Node.js e consumido no frontend usando React.
+A Leaky Bucket system to limit requests implemented with GraphQL query using Node.js and consumed on the frontend using React.
 
-## Tecnologias
+## Technologies
 
 - **Backend**: Node.js, TypeScript, Koa.js, Apollo Server
 - **Frontend**: React, TypeScript, Relay, TailwindCSS
 - **Container**: Docker
 
-## Visão Geral
+## Overview
 
-Sistema de limitação baseado em tokens:
-- Máximo de 10 tokens por usuário
-- Requisições com falha consomem 1 token
-- Requisições bem-sucedidas não consomem tokens
-- Quando tokens = 0, novas requisições são bloqueadas
-- A cada 1 hora, 1 token é adicionado
+Token-based limiting system:
+- Maximum of 10 tokens per user
+- Failed requests consume 1 token
+- Successful requests do not consume tokens
+- When tokens = 0, new requests are blocked
+- Every 1 hour, 1 token is added
 
-## Executando com Docker
+## Running with Docker
 
-### Requisitos
+### Requirements
 
 - Docker
 - Docker Compose
 
-### Passos
+### Steps
 
-1. **Clone o repositório**:
+1. **Clone the repository**:
 ```bash
 git clone https://github.com/GuiiHenriq/woovi-challenge-leaky-bucket
 cd leaky-bucket
 ```
 
-2. **Inicie os containers**:
+2. **Start the containers**:
 ```bash
 docker-compose up
 ```
 
-Portas:
+Ports:
 - Backend: 3000
 - Frontend: 5173
 - MongoDB: 27017
 
-3. **Acesse**:
+3. **URLs**:
 - Frontend: [http://localhost:5173](http://localhost:5173)
 - GraphQL API: [http://localhost:3000/graphql](http://localhost:3000/graphql)
 
-## Exemplos de Consultas GraphQL
+## GraphQL Query Examples
 
-### Registrar Usuário
+### Register User
 
 ```graphql
 mutation {
   register(input: {
-    username: "usuario_teste",
-    password: "senha123"
+    username: "usertest",
+    password: "pass123"
   }) {
     token
     user {
@@ -70,8 +70,8 @@ mutation {
 ```graphql
 mutation {
   login(input: {
-    username: "usuario_teste",
-    password: "senha123"
+    username: "usertest",
+    password: "pass123"
   }) {
     token
     user {
@@ -82,7 +82,7 @@ mutation {
 }
 ```
 
-### Saldo de Tokens
+### Token Balance
 
 ```graphql
 query {
@@ -93,9 +93,9 @@ query {
 }
 ```
 
-**OBS**: Requer autenticação.
+**NOTE**: Requires authentication.
 
-### Transação PIX
+### PIX Transaction
 
 ```graphql
 mutation {
@@ -113,32 +113,32 @@ mutation {
 }
 ```
 
-**OBS**: Requer autenticação.
+**NOTE**: Requires authentication.
 
-### Autenticação
+### Authentication
 
-Para endpoints que precisam de autenticação:
+For endpoints that need authentication:
 ```
-Authorization: Bearer seu_token_aqui
+Authorization: Bearer your_token_here
 ```
 
-## Acesso à Página Admin
+## Admin Page Access
 
-- Acesse a página de login de administrador em: [http://localhost:5173/admin](http://localhost:5173/admin)
-- Após o login, você será redirecionado para o painel admin em `/admin/dashboard`.
+- Access the admin login page at: [http://localhost:5173/admin](http://localhost:5173/admin)
+- After login, you will be redirected to the admin panel at `/admin/dashboard`.
 
-**Credenciais:**
-- Usuário: `admin`
-- Senha: `admin`
+**Credentials:**
+- Username: `admin`
+- Password: `admin`
 
-## Diagrama
+## Diagram
 ![Diagram Solution](https://raw.githubusercontent.com/GuiiHenriq/woovi-challenge-leaky-bucket/refs/heads/feature/project-improvements/diagram.png?token=GHSAT0AAAAAADGRNPFB2JDGYPPRCLOG4GRG2DLBLYA)
 
-## Atomicidade
+## Atomicity
 
-Foi implementado atomicidade usando o Redis:
+Atomicity was implemented using Redis:
 
-### Exemplo: Consumo de Token
+### Example: Token Consumption
 
 ```typescript
 export const consumeToken = async (userId: string): Promise<boolean> => {
@@ -156,22 +156,22 @@ return result === 1;
 };
 ```
 
-O script Lua garante que:
-1. Verificamos disponibilidade de tokens
-2. Decrementamos o contador
-3. Tudo em uma única operação atômica
+The Lua script ensures that:
+1. We check token availability
+2. We decrease the counter
+3. Everything in a single atomic operation
 
-## Estimativa de Custo Anual (MongoDB + Redis)
+## Annual Cost Estimate (MongoDB + Redis)
 
-| Nº de Usuários | MongoDB (Armazenamento) | Redis (Armazenamento) | Custo Total Anual Estimado |
+| Number of Users | MongoDB (Storage) | Redis (Storage) | Total Annual Estimated Cost |
 |----------------|--------------------------|------------------------|-----------------------------|
-| 1.000 | Grátis (Free Tier) | Grátis | **US$ 0** |
-| 10.000 | Grátis (Free Tier) | Grátis | **US$ 0** |
-| 50.000 | M2 (~US$9/mês) | Grátis | **~US$ 108** |
-| 100.000 | M5 (~US$25/mês) | Grátis ou ~US$1/mês | **~US$ 312** |
-| 500.000 | M10+ (~US$60/mês) | Redis pago (~US$3/mês) | **~US$ 756** |
+| 1.000 | Free (Free Tier) | Free | **$0 USD** |
+| 10.000 | Free (Free Tier) | Free | **$0 USD** |
+| 50.000 | M2 (~$9 USD/month) | Free | **~$108 USD** |
+| 100.000 | M5 (~$25 USD/month) | Free or ~$1 USD/month | **~~$312 USD** |
+| 500.000 | M10+ (~$60 USD/month) | Paid Redis (~$3 USD/month) | **~~$756 USD** |
 
-> ⚠️ Estes valores são apenas estimativas com base no uso de armazenamento médio por usuário:
-> - MongoDB: ~1 KB por usuário
-> - Redis: ~100 bytes por usuário
-> Preços baseados nos planos do [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) e [Upstash Redis](https://upstash.com/).
+> ⚠️ These values are only estimates based on average storage usage per user:
+> - MongoDB: ~1 KB per user
+> - Redis: ~100 bytes per user
+> Prices based on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and [Upstash Redis](https://upstash.com/).
