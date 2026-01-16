@@ -3,7 +3,7 @@
     "_postman_id": "a8d3f7e2-5b2d-4f3a-9e9c-9b5e3d3e8f7a",
     "name": "Leaky Bucket GraphQL API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Coleção para testes da API GraphQL do projeto Leaky Bucket"
+    "description": "Collection for testing the BucketFlow GraphQL API"
   },
   "item": [
     {
@@ -34,7 +34,7 @@
                 "graphql"
               ]
             },
-            "description": "Registrar um novo usuário e obter token JWT"
+            "description": "Register a new user and obtain JWT token"
           },
           "response": []
         },
@@ -63,12 +63,12 @@
                 "graphql"
               ]
             },
-            "description": "Fazer login e obter token JWT"
+            "description": "Login and obtain JWT token"
           },
           "response": []
         }
       ],
-      "description": "Operações de autenticação (registro e login)"
+      "description": "Authentication operations (registration and login)"
     },
     {
       "name": "2. Tokens",
@@ -102,12 +102,12 @@
                 "graphql"
               ]
             },
-            "description": "Consultar o saldo de tokens do usuário"
+            "description": "Check the user's token balance"
           },
           "response": []
         }
       ],
-      "description": "Operações relacionadas a tokens"
+      "description": "Token-related operations"
     },
     {
       "name": "3. PIX Transactions",
@@ -141,7 +141,7 @@
                 "graphql"
               ]
             },
-            "description": "Consultar uma chave PIX"
+            "description": "Query a PIX key"
           },
           "response": []
         },
@@ -174,7 +174,7 @@
                 "graphql"
               ]
             },
-            "description": "Consultar uma chave PIX e obter o saldo de tokens atualizado"
+            "description": "Query a PIX key and get updated token balance"
           },
           "response": []
         },
@@ -207,12 +207,12 @@
                 "graphql"
               ]
             },
-            "description": "Consultar uma chave PIX inválida (consome token)"
+            "description": "Query an invalid PIX key (consumes token)"
           },
           "response": []
         }
       ],
-      "description": "Operações de transação PIX"
+      "description": "PIX transaction operations"
     },
     {
       "name": "4. User Info",
@@ -246,12 +246,12 @@
                 "graphql"
               ]
             },
-            "description": "Obter informações do usuário atual"
+            "description": "Get current user information"
           },
           "response": []
         }
       ],
-      "description": "Operações relacionadas a informações do usuário"
+      "description": "User information operations"
     }
   ],
   "event": [
@@ -269,15 +269,15 @@
       "script": {
         "type": "text/javascript",
         "exec": [
-          "// Extrair e salvar o token JWT após login ou registro",
+          "// Extract and save JWT token after login or registration",
           "const jsonData = pm.response.json();",
           "if (jsonData && jsonData.data) {",
           "    if (jsonData.data.login && jsonData.data.login.token) {",
           "        pm.environment.set(\"token\", jsonData.data.login.token);",
-          "        console.log(\"Token salvo do login: \" + jsonData.data.login.token);",
+          "        console.log(\"Token saved from login: \" + jsonData.data.login.token);",
           "    } else if (jsonData.data.register && jsonData.data.register.token) {",
           "        pm.environment.set(\"token\", jsonData.data.register.token);",
-          "        console.log(\"Token salvo do registro: \" + jsonData.data.register.token);",
+          "        console.log(\"Token saved from registration: \" + jsonData.data.register.token);",
           "    }",
           "}"
         ]
@@ -287,7 +287,7 @@
   "variable": [
     {
       "key": "token",
-      "value": "seu_token_jwt_aqui",
+      "value": "your_jwt_token_here",
       "type": "string"
     }
   ]

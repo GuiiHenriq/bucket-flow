@@ -75,12 +75,12 @@ export default function () {
   });
 
   const registerSuccess = check(registerResponse, {
-    "registro bem-sucedido": (r) => r.status === 200 && !r.json().errors,
-    "token obtido": (r) => r.json().data?.register?.token,
+    "successful registration": (r) => r.status === 200 && !r.json().errors,
+    "token obtained": (r) => r.json().data?.register?.token,
   });
 
   if (!registerSuccess) {
-    console.error("Falha no registro do usuário");
+    console.error("User registration failed");
     return;
   }
 
@@ -89,18 +89,18 @@ export default function () {
   const initialTokensResponse = graphqlRequest(getTokensQuery, {}, token);
 
   const initialCheckSuccess = check(initialTokensResponse, {
-    "consulta tokens inicial bem-sucedida": (r) =>
+    "initial token query successful": (r) =>
       r.status === 200 && !r.json().errors,
-    "tokens iniciais disponíveis": (r) => r.json().data?.getTokens?.tokens > 0,
+    "initial tokens available": (r) => r.json().data?.getTokens?.tokens > 0,
   });
 
   if (!initialCheckSuccess) {
-    console.error("Falha ao verificar tokens iniciais");
+    console.error("Failed to verify initial tokens");
     return;
   }
 
   const initialTokens = initialTokensResponse.json().data.getTokens.tokens;
-  console.log(`Usuário ${username} iniciou com ${initialTokens} tokens`);
+  console.log(`User ${username} started with ${initialTokens} tokens`);
 
   let currentTokens = initialTokens;
   const maxConsumptionAttempts = 15;
@@ -127,7 +127,7 @@ export default function () {
         const decrease = currentTokens - newTokens;
         tokenDecreaseTrend.add(decrease);
         console.log(
-          `Tokens diminuíram: ${currentTokens} -> ${newTokens} (-${decrease})`
+          `Tokens decreased: ${currentTokens} -> ${newTokens} (-${decrease})`
         );
       }
 
@@ -141,7 +141,7 @@ export default function () {
 
   if (currentTokens <= 0) {
     console.log(
-      `Tokens esgotados após ${attemptsDone} tentativas. Testando bloqueio...`
+      `Tokens depleted after ${attemptsDone} attempts. Testing blocking...`
     );
 
     const blockedResponse = graphqlRequest(
@@ -151,7 +151,7 @@ export default function () {
     );
 
     check(blockedResponse, {
-      "requisição bloqueada com sucesso": (r) =>
+      "request successfully blocked": (r) =>
         r.status === 200 &&
         r.json().errors &&
         r.json().errors[0].message.includes("Rate limit exceeded"),
@@ -161,14 +161,14 @@ export default function () {
       blockedResponse.json().errors &&
       blockedResponse.json().errors[0].message.includes("Rate limit exceeded")
     ) {
-      console.log("Bloqueio de taxa funcionando corretamente!");
+      console.log("Rate limiting working correctly!");
     } else {
-      console.error("Falha no bloqueio de taxa após esgotamento de tokens");
+      console.error("Rate limiting failed after token depletion");
       failedRequestsAfterDepletion.add(1);
     }
   } else {
     console.log(
-      `Não foi possível esgotar os tokens após ${attemptsDone} tentativas.`
+      `Failed to deplete tokens after ${attemptsDone} attempts.`
     );
   }
 

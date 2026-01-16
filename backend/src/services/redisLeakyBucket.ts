@@ -21,7 +21,7 @@ export const initUserTokens = async (userId: string): Promise<TokenBucket> => {
     .pipeline()
     .hset(bucketKey, "tokens", MAX_TOKENS)
     .hset(bucketKey, "lastRefill", now.toISOString())
-    .expire(bucketKey, 60 * 60 * 24 * 7) // Expira em 7 dias
+    .expire(bucketKey, 60 * 60 * 24 * 7) // Expires in 7 days
     .exec();
 
   return {

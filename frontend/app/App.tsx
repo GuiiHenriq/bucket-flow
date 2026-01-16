@@ -143,7 +143,7 @@ const AppRoutes = () => {
               <Suspense fallback={
                 <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
                   <div className="w-48 h-28 flex items-center justify-center text-gray-400 animate-pulse">
-                    Carregando tokens...
+                    Loading tokens...
                   </div>
                 </div>
               }>

@@ -98,8 +98,8 @@ function makeGraphQLRequest(query, variables = {}, token = null) {
   apiResponseTime.add(duration);
 
   check(response, {
-    "requisição bem-sucedida": (r) => r.status === 200,
-    "sem erros no servidor": (r) => !r.json().errors,
+    "successful request": (r) => r.status === 200,
+    "no server errors": (r) => !r.json().errors,
   }) || failureRate.add(1);
 
   return response;
@@ -116,7 +116,7 @@ function registerAndLoginUser() {
   });
 
   const registerSuccess = check(registerResponse, {
-    "registro bem-sucedido": (r) => r.status === 200 && !r.json().errors,
+    "successful registration": (r) => r.status === 200 && !r.json().errors,
   });
 
   if (!registerSuccess) {
@@ -131,7 +131,7 @@ function registerAndLoginUser() {
   });
 
   const loginSuccess = check(loginResponse, {
-    "login bem-sucedido": (r) => r.status === 200 && !r.json().errors,
+    "successful login": (r) => r.status === 200 && !r.json().errors,
   });
 
   if (!loginSuccess) {
@@ -155,11 +155,11 @@ function registerAndLoginUser() {
 
 function queryRandomPixKey(token) {
   const pixKeys = [
-    "12345678900", // Válida
-    "joao@example.com", // Válida
-    "random@invalid.com", // Inválida
-    "invalid_key", // Inválida
-    "99999999999", // Inválida
+    "12345678900", // Valid
+    "joao@example.com", // Valid
+    "random@invalid.com", // Invalid
+    "invalid_key", // Invalid
+    "99999999999", // Invalid
   ];
 
   const key = pixKeys[Math.floor(Math.random() * pixKeys.length)];
@@ -188,7 +188,7 @@ export default function () {
   }
 
   if (!user) {
-    console.error("Falha ao obter usuário válido");
+    console.error("Failed to get valid user");
     failureRate.add(1);
     sleep(1);
     return;

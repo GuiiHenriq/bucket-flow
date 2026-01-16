@@ -94,9 +94,9 @@ function registerUser() {
   registerTime.add(duration);
 
   const success = check(response, {
-    "registro retornou 200": (r) => r.status === 200,
-    "registro sem erros": (r) => !r.json().errors,
-    "token válido retornado": (r) => r.json().data?.register?.token?.length > 0,
+    "register returned 200": (r) => r.status === 200,
+    "register without errors": (r) => !r.json().errors,
+    "valid token returned": (r) => r.json().data?.register?.token?.length > 0,
   });
 
   registerSuccessRate.add(success ? 1 : 0);
@@ -127,9 +127,9 @@ function loginUser(username, password) {
   loginTime.add(duration);
 
   const success = check(response, {
-    "login retornou 200": (r) => r.status === 200,
-    "login sem erros": (r) => !r.json().errors,
-    "token válido de login": (r) => r.json().data?.login?.token?.length > 0,
+    "login returned 200": (r) => r.status === 200,
+    "login without errors": (r) => !r.json().errors,
+    "valid login token": (r) => r.json().data?.login?.token?.length > 0,
   });
 
   loginSuccessRate.add(success ? 1 : 0);
@@ -152,7 +152,7 @@ export function concurrentLogins() {
   const user = registeredUsers[userIndex];
 
   if (!user) {
-    console.error("Falha ao obter usuário válido para login");
+    console.error("Failed to get valid user for login");
     loginSuccessRate.add(0);
     return;
   }
@@ -163,7 +163,7 @@ export function concurrentLogins() {
 
 export function invalidLoginAttempts() {
   const username = `user_${randomString(8)}`;
-  const password = "senha_errada";
+  const password = "wrong_password";
 
   const start = new Date();
   const response = makeGraphQLRequest(loginMutation, {
@@ -174,7 +174,7 @@ export function invalidLoginAttempts() {
   loginTime.add(duration);
 
   check(response, {
-    "resposta de erro formatada corretamente": (r) =>
+    "error response formatted correctly": (r) =>
       r.status === 200 && r.json().errors && r.json().errors.length > 0,
   });
 

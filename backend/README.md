@@ -1,31 +1,30 @@
-# Back-end
+# Backend
 
-
-## Requisitos
+## Requirements
 
 - Node.js 18+
-- npm 9+ ou yarn
-- MongoDB e Redis em execução (ou use Docker)
+- npm 9+ or yarn
+- MongoDB and Redis running (or use Docker)
 
-## Instalação
+## Installation
 
 ```bash
 cd backend
 npm install
 ```
 
-## Comandos
+## Scripts
 
-### Rodar em modo desenvolvimento
+### Run Development Server
 
 ```bash
 npm run dev
 ```
-O servidor será iniciado em [http://localhost:3000](http://localhost:3000)
+The server will start at [http://localhost:3000](http://localhost:3000)
 
 ---
 
-### Rodar em modo produção
+### Run Production Build
 
 ```bash
 npm run build
@@ -34,15 +33,15 @@ npm start
 
 ---
 
-### Testes
+### Testing
 
-Executar todos os testes:
+Run all tests:
 
 ```bash
 npm test
 ```
 
-Executar testes com relatório de cobertura:
+Run tests with coverage report:
 
 ```bash
 npm run test:coverage
@@ -50,13 +49,13 @@ npm run test:coverage
 
 ---
 
-### Lint (análise de código)
+### Code Linting
 
 ```bash
 npm run lint
 ```
 
-Corrigir problemas automaticamente:
+Fix issues automatically:
 
 ```bash
 npm run lint:fix
@@ -64,9 +63,9 @@ npm run lint:fix
 
 ---
 
-## Variáveis de Ambiente
+## Environment Variables
 
-Crie um arquivo `.env` na raiz do backend com essas variáveis.
+Create a `.env` file in the backend root directory with the following variables:
 
 ```
 JWT_SECRET=token
@@ -75,9 +74,9 @@ PORT=3000
 
 ---
 
-OBS: Use algum gerador de Secret KEY, como: https://jwtsecret.com/generate
+**Note:** Use a secret key generator, such as: https://jwtsecret.com/generate
 
-## Outras informações
+## Additional Information
 
-- O entrypoint principal é `src/server.ts`.
-- O projeto utiliza TypeScript, ESLint e Jest para testes.
+- The main entry point is `src/server.ts`.
+- The project uses TypeScript, ESLint, and Jest for testing.

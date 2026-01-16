@@ -1,49 +1,48 @@
-# Front-end
+# Frontend
 
-
-## Requisitos
+## Requirements
 
 - Node.js 18+
-- npm 9+ ou yarn
+- npm 9+ or yarn
 
-## Instalação
+## Installation
 
 ```bash
 cd frontend
 npm install
 ```
 
-## Comandos
+## Scripts
 
-### Rodar o Front-end em modo desenvolvimento
+### Run Development Server
 
 ```bash
 npm run dev
 ```
-Acesse: [http://localhost:5173](http://localhost:5173)
+Access: [http://localhost:5173](http://localhost:5173)
 
 ---
 
-### Build de produção
+### Production Build
 
 ```bash
 npm run build
 ```
 
-Os arquivos finais ficarão em `dist/`.
+Output files will be generated in the `dist/` directory.
 
 ---
 
-### Preview do build de produção
+### Preview Production Build
 
 ```bash
 npm run preview
 ```
-Acesse: [http://localhost:4173](http://localhost:4173)
+Access: [http://localhost:4173](http://localhost:4173)
 
 ---
 
-### Lint (análise de código)
+### Code Linting
 
 ```bash
 npm run lint
@@ -51,19 +50,19 @@ npm run lint
 
 ---
 
-### Relay (gerar artefatos GraphQL)
+### Relay Code Generation
 
-Sempre que alterar queries ou o schema GraphQL, rode:
+Whenever you modify GraphQL queries or the schema, execute:
 
 ```bash
 npm run relay
 ```
 
-Isso irá gerar/atualizar os arquivos em `app/__generated__/`.
+This will generate and update artifacts in the `app/__generated__/` directory.
 
 ---
 
-## Outras informações
+## Additional Information
 
-- O schema GraphQL usado pelo Relay está em `frontend/schema.graphql`.
-- O arquivo de configuração do Relay é `relay.config.json`.
+- The GraphQL schema used by Relay is located at `frontend/schema.graphql`.
+- The Relay configuration file is `relay.config.json`.

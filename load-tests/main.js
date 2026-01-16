@@ -123,7 +123,7 @@ function registerUser() {
   });
 
   const success = check(response, {
-    "registro bem-sucedido": (r) => r.status === 200 && !r.json().errors,
+    "successful registration": (r) => r.status === 200 && !r.json().errors,
   });
 
   if (!success) {
@@ -150,7 +150,7 @@ function loginUser(username, password) {
   });
 
   const success = check(response, {
-    "login bem-sucedido": (r) => r.status === 200 && !r.json().errors,
+    "successful login": (r) => r.status === 200 && !r.json().errors,
   });
 
   if (!success) {
@@ -166,9 +166,9 @@ function checkTokens(token) {
   const response = makeGraphQLRequest(getTokensQuery, {}, token);
 
   check(response, {
-    "consulta de tokens bem-sucedida": (r) =>
+    "successful token query": (r) =>
       r.status === 200 && !r.json().errors,
-    "tokens visíveis": (r) =>
+    "tokens visible": (r) =>
       r.json().data &&
       r.json().data.getTokens &&
       typeof r.json().data.getTokens.tokens === "number",
@@ -187,8 +187,8 @@ function queryPixKey(token, key) {
   const response = makeGraphQLRequest(queryPixKeyMutation, { key }, token);
 
   const success = check(response, {
-    "requisição pix completa": (r) => r.status === 200,
-    "sem erros de servidor": (r) => !r.json().errors,
+    "complete PIX request": (r) => r.status === 200,
+    "no server errors": (r) => !r.json().errors,
   });
 
   if (success && response.json().data && response.json().data.queryPixKey) {
@@ -216,7 +216,7 @@ export default function () {
 
     if (initialTokens !== null) {
       console.log(
-        `Usuário ${user.username} iniciou com ${initialTokens} tokens`
+        `User ${user.username} started with ${initialTokens} tokens`
       );
 
       const validKeys = ["12345678900", "joao@example.com"];
@@ -233,9 +233,7 @@ export default function () {
 
       if (finalTokens !== null && initialTokens !== null) {
         console.log(
-          `Usuário ${
-            user.username
-          } terminou com ${finalTokens} tokens (diferença: ${
+          `User ${user.username} finished with ${finalTokens} tokens (difference: ${
             initialTokens - finalTokens
           })`
         );
@@ -253,7 +251,7 @@ export function leakyBucketTest() {
 
   let tokens = checkTokens(user.token);
   console.log(
-    `[Leaky Bucket] Usuário ${user.username} iniciou com ${tokens} tokens`
+    `[Leaky Bucket] User ${user.username} started with ${tokens} tokens`
   );
 
   let attempts = 0;
@@ -261,7 +259,7 @@ export function leakyBucketTest() {
 
   while (tokens > 0 && attempts < 20) {
     console.log(
-      `[Leaky Bucket] Tentativa ${attempts + 1}: ${tokens} tokens restantes`
+      `[Leaky Bucket] Attempt ${attempts + 1}: ${tokens} tokens remaining`
     );
 
     queryPixKey(user.token, `invalid_key_${randomIntBetween(1000, 9999)}`);
@@ -272,10 +270,10 @@ export function leakyBucketTest() {
 
     if (lastTokenCount > tokens) {
       console.log(
-        `[Leaky Bucket] Token consumido: ${lastTokenCount} -> ${tokens}`
+        `[Leaky Bucket] Token consumed: ${lastTokenCount} -> ${tokens}`
       );
     } else {
-      console.log(`[Leaky Bucket] Nenhum token consumido: ${tokens}`);
+      console.log(`[Leaky Bucket] No token consumed: ${tokens}`);
     }
 
     lastTokenCount = tokens;
@@ -284,12 +282,12 @@ export function leakyBucketTest() {
 
   if (tokens === 0) {
     console.log(
-      `[Leaky Bucket] Usuário ${user.username} esgotou os tokens após ${attempts} tentativas`
+      `[Leaky Bucket] User ${user.username} depleted tokens after ${attempts} attempts`
     );
 
     const result = queryPixKey(user.token, "qualquer_valor");
     console.log(
-      `[Leaky Bucket] Resultado após esgotar tokens: ${JSON.stringify(result)}`
+      `[Leaky Bucket] Result after depleting tokens: ${JSON.stringify(result)}`
     );
   }
 

@@ -29,11 +29,7 @@ export function AdminPanel() {
       const token = localStorage.getItem("authToken");
       if (!token) {
         setIsAdmin(false);
-        setError("Você precisa estar autenticado para acessar este painel");
-        return;
-      }
-
-      setIsAdmin(true);
+        setError("You must be authenticated to access this panel");
     };
 
     checkAdminStatus();
@@ -50,7 +46,7 @@ export function AdminPanel() {
   if (!isAdmin) {
     return (
       <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
-        <p>Acesso restrito a administradores.</p>
+        <p>Admin access only.</p>
       </div>
     );
   }
@@ -63,7 +59,7 @@ export function AdminPanel() {
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
       <h2 className="text-2xl font-bold mb-4">
-        Painel Administrativo - Tokens
+        Admin Dashboard - Tokens
       </h2>
 
       <div className="overflow-x-auto">
@@ -71,20 +67,20 @@ export function AdminPanel() {
           <thead>
             <tr>
               <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Usuário Atual
+                Current User
               </th>
               <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Tokens
               </th>
               <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Último Recarregamento
+                Last Refill
               </th>
             </tr>
           </thead>
           <tbody>
             <tr className="bg-gray-50">
               <td className="py-2 px-4 border-b border-gray-200">
-                Usuário Atual
+                Current User
               </td>
               <td className="py-2 px-4 border-b border-gray-200">
                 <span
@@ -111,20 +107,18 @@ export function AdminPanel() {
 
       <div className="mt-4 text-sm text-gray-500">
         <p>
-          Este painel mostra informações sobre o bucket de tokens do usuário
-          atual.
+          This panel displays information about the current user's token bucket.
         </p>
-        <p className="mt-1">Cores indicam status dos tokens:</p>
+        <p className="mt-1">Color indicators show token status:</p>
         <ul className="list-disc ml-5 mt-1">
           <li>
-            <span className="text-green-700">Verde</span>: Tokens suficientes
+            <span className="text-green-700">Green</span>: Sufficient tokens
           </li>
           <li>
-            <span className="text-yellow-700">Amarelo</span>: Tokens limitados
+            <span className="text-yellow-700">Yellow</span>: Limited tokens
           </li>
           <li>
-            <span className="text-red-700">Vermelho</span>: Tokens quase
-            esgotados
+            <span className="text-red-700">Red</span>: Tokens nearly depleted
           </li>
         </ul>
       </div>

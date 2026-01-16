@@ -1,4 +1,4 @@
-# Leaky Bucket - Woovi Challenge
+# BucketFlow
 
 A Leaky Bucket system to limit requests implemented with GraphQL query using Node.js and consumed on the frontend using React.
 
@@ -28,8 +28,8 @@ Token-based limiting system:
 
 1. **Clone the repository**:
 ```bash
-git clone https://github.com/GuiiHenriq/woovi-challenge-leaky-bucket
-cd leaky-bucket
+git clone https://github.com/GuiiHenriq/bucket-flow
+cd bucket-flow
 ```
 
 2. **Start the containers**:
